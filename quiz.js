@@ -1,5 +1,21 @@
+function shuffleArray(array) {
+    let currentIndex = array.length;
+    let temporaryValue, randomIndex;
+
+    while (currentIndex !== 0) {
+        randomIndex = Math.floor(Math.random() * currentIndex);
+        currentIndex -= 1;
+
+        temporaryValue = array[currentIndex];
+        array[currentIndex] = array[randomIndex];
+        array[randomIndex] = temporaryValue;
+    }
+    return array;
+}
+
 module.exports = class Quiz {
-    constructor(amount) {
+    async getAllQuiz() {
+        const amount = 10;
         if (Number.isInteger(amount) === false || amount < 0)
             throw new RangeError('amount should be unsigned interger.');
 
@@ -9,24 +25,14 @@ module.exports = class Quiz {
             proxy: false
         });
 
-        this.axios.get('https://opentdb.com/api.php?amount=' + amount)
-            .then((response) => {
-                if (response.ok === false)
-                    throw new Error('Failed to fetch url ' + response.url);
-                if (response.data['response_code'] === 0 && response.data['results'].length === amount)
-                    this.quizes = response.data['results'];
-                else
-                    throw new Error('Invalid response from the Quiz server.');
-            })
-            .catch((error) => {
-                throw error;
-            });
-    }
-
-    getAllQuiz() {
-        if (this.quizes !== undefined)
-            return this.quizes;
-        else
-            return undefined;
+        const response = await this.axios.get('https://opentdb.com/api.php?amount=' + amount)
+        if (response) {
+            if (response.data.response_code === 0 && response.data.results.length === amount) {
+                this.quizes = response.data.results;
+                return shuffleArray(this.quizes);
+            }
+            else
+                throw new Error('Invalid response from the Quiz server.');
+        }
     }
 }

@@ -7,131 +7,7 @@
     integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
   -->
   <title>クイズ</title>
-  <script type="text/javascript">
-    const retry_interval = 200;
-    const retry_count = 30 * 1000 / retry_interval;
-    var quizes;
-    var intervalID;
-    var correct_number = 0;
-
-    function clearAllChildElements(element) {
-      while (element.childElementCount > 0) {
-        element.removeChild(element.lastChild);
-      }
-    }
-    function htmlDecode(input) {
-      var e = document.createElement('textarea');
-      e.innerHTML = input;
-      return e.childNodes.length === 0 ? "" : e.childNodes[0].nodeValue;
-    }
-    function shuffleArray(array) {
-      let currentIndex = array.length;
-      let temporaryValue, randomIndex;
-
-      while (currentIndex !== 0) {
-        randomIndex = Math.floor(Math.random() * currentIndex);
-        currentIndex -= 1;
-
-        temporaryValue = array[currentIndex];
-        array[currentIndex] = array[randomIndex];
-        array[randomIndex] = temporaryValue;
-      }
-      return array;
-    }
-
-    function showQuiz(quiz_no) {
-      if (!quizes)
-        return;
-
-      if (quiz_no > (quizes.length - 1)) {
-        clearAllChildElements(document.getElementById('answer_area'));
-        document.getElementById('quiz_title').innerText = "あなたの正答数は" + correct_number + "です！！";
-        document.getElementById('quiz_category').innerText = "";
-        document.getElementById('quiz_difficulty').innerText = "";
-        document.getElementById('quiz_description').innerText = "再度チャレンジしたい場合は以下をクリック！！";
-        document.getElementById('form_button_main').value = "ホームに戻る";
-        document.getElementById('form_button_main').style.display = "block"; // ボタンを表示する
-        return;
-      }
-
-      clearAllChildElements(document.getElementById('answer_area'));
-
-      document.getElementById('quiz_title').innerText = "問題" + (quiz_no + 1);
-      document.getElementById('quiz_category').innerText = "[ジャンル] " + htmlDecode(quizes[quiz_no]['category']);
-      document.getElementById('quiz_difficulty').innerText = "[難易度] " + htmlDecode(quizes[quiz_no]['difficulty']);
-      document.getElementById('quiz_description').innerText = htmlDecode(quizes[quiz_no]['question']);
-
-      var answer_buttons = new Array();
-
-      const correct_button = document.createElement("input");
-      correct_button.type = "button";
-      correct_button.value = htmlDecode(quizes[quiz_no]['correct_answer']);
-      correct_button.correct = true;
-      correct_button.onclick = function () {
-        correct_number++;
-        showQuiz(quiz_no + 1);
-      }
-      answer_buttons.push(correct_button);
-
-      quizes[quiz_no]['incorrect_answers'].forEach(incorrect_answer => {
-        const incorrect_button = document.createElement("input");
-        incorrect_button.type = "button";
-        incorrect_button.value = htmlDecode(incorrect_answer);
-        incorrect_button.correct = false;
-        incorrect_button.onclick = function () {
-          showQuiz(quiz_no + 1);
-        }
-        answer_buttons.push(incorrect_button);
-      });
-
-      answer_buttons = shuffleArray(answer_buttons);
-      answer_buttons.forEach((answer_button) => {
-        document.getElementById('answer_area').appendChild(answer_button);
-      });
-    }
-
-    function fetchQuizes() {
-      fetch('/quizes')
-        .then((response) => {
-          if (!response.ok)
-            throw new Error('クイズ取得の際にアクセスエラーが発生しました。');
-          return response.json();
-        })
-        .then((json) => {
-          if (!json) {
-            if (retry_count > 0) {
-              retry_cout -= 1;
-              return;
-            }
-            else
-              throw new Error('クイズ取得データにエラーがありました。');
-          }
-          if (json.length < 1) {
-            if (retry_count > 0) {
-              retry_cout -= 1;
-              return;
-            }
-            else
-              throw new Error('クイズが1つも取得できませんでした。');
-          }
-          quizes = shuffleArray(json);
-          window.clearInterval(intervalID);
-          showQuiz(0);
-        })
-        .catch((error) => {
-          alert(error);
-        });
-    }
-
-    function onClickMain() {
-      correct_number = 0;
-      quizes = undefined;
-      document.getElementById('form_button_main').style.display = "none"; // ボタンを消す
-      document.getElementById('quiz_title').innerText = "取得中";
-      document.getElementById('quiz_description').innerText = "少々お待ち下さい";
-      intervalID = window.setInterval(fetchQuizes, retry_interval);
-    }
-  </script>
+  <script type="text/javascript" src="/js/dashboard.js"></script>
 </head>
 
 <body onload="">
@@ -142,7 +18,7 @@
   <p id="quiz_description">以下のボタンをクリック</p>
   <hr />
   <form name="main">
-    <input type="button" value="開始" id="form_button_main" onclick="onClickMain()"></input>
+    <input type="button" value="開始" id="form_button_main"></input>
     <div id="answer_area"></div>
   </form>
 

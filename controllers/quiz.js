@@ -1,5 +1,7 @@
-module.exports.getQuizes = function (req, res) {
-    const quizes = req.app.locals.quiz.getAllQuiz();
+module.exports.getQuizes = async function (req, res) {
+    const Quiz = require('../quiz');
+    const quiz = new Quiz();
+    const quizes = await quiz.getAllQuiz();
     if (quizes !== undefined)
         res.json(quizes);
     else

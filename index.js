@@ -8,10 +8,8 @@ const controller_quiz = require('./controllers/quiz');
 
 // ExpressJS初期化
 const express = require('express');
-const Quiz = require('./quiz');
 const app = express();
 app.use(express.urlencoded({ extended: true }));
-app.locals.quiz = new Quiz(10);
 
 // アプリケーション設定
 const port = process.env.PORT || 3000;
@@ -31,6 +29,9 @@ app.get('/quizes', controller_quiz.getQuizes);
 app.get('/',
   controller_dashboard.dashboardRedirect
 );
+
+// 静的ファイル
+app.use(express.static('public'));
 
 // *****************************************
 // サーバー開始
