@@ -52,7 +52,7 @@ function showQuiz(quizNo) {
     document.getElementById('quiz_difficulty').innerText = '[難易度] ' + htmlDecode(quizes[quizNo].difficulty);
     document.getElementById('quiz_description').innerText = htmlDecode(quizes[quizNo].question);
 
-    let answerButtons = new Array();
+    let answerButtons = [];
 
     const correctButton = document.createElement('input');
     correctButton.type = 'button';
@@ -89,22 +89,6 @@ function fetchQuizes() {
             return response.json();
         })
         .then((json) => {
-            if (!json) {
-                if (retryCount > 0) {
-                    retryCount -= 1;
-                    return;
-                }
-                else
-                    throw new Error('クイズ取得データにエラーがありました。');
-            }
-            if (json.length < 1) {
-                if (retryCount > 0) {
-                    retryCount -= 1;
-                    return;
-                }
-                else
-                    throw new Error('クイズが1つも取得できませんでした。');
-            }
             quizes = json;
             window.clearInterval(intervalID);
             showQuiz(0);

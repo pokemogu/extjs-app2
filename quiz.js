@@ -16,8 +16,6 @@ function shuffleArray(array) {
 module.exports = class Quiz {
     async getAllQuiz() {
         const amount = 10;
-        if (Number.isInteger(amount) === false || amount < 0)
-            throw new RangeError('amount should be unsigned interger.');
 
         const Axios = require('axios');
         this.axios = Axios.create({
